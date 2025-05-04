@@ -92,7 +92,7 @@
     <h1>Upload Image with Metadata</h1>
     <div class="form-group">
       <label for="image">Select Image:</label>
-      <input type="file" id="image" name="image" accept="image/*" required>
+      <input type="file" id="image" name="image" accept="image/*">
       <img id="image-preview" src="#" alt="Image Preview">
     </div>
 
@@ -163,24 +163,67 @@
   </div>
 
   <script>
+    const { ipcRenderer } = require('electron');
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('image-preview');
+
     let loadedData = [];
     let selectedIndex = -1;
+    let currentImageFile = null;  // Store current uploaded file
+    let currentImagePath = '';    // Store original path (e.g., from JSON)
+
+    imageInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            currentImageFile = file;
+            currentImagePath = ""; // clear previous path
+        };
+        reader.readAsDataURL(file); 
+    } else {
+        preview.src = '#';
+        preview.style.display = 'none';
+        currentImageFile = null;
+        currentImagePath = '';
+    }
+    }); 
+
+    function saveEntryWithImage(formData, imageFile) {
+        const fileReader = new FileReader();
+        fileReader.onload = function (e) {
+            // Send everything to the main process
+            ipcRenderer.send('save-entry', {
+                formData,
+                imageBuffer: e.target.result,
+                imageName: `${formData.Id}.png`
+            });
+        };
+
+        if (imageFile) {
+            fileReader.readAsArrayBuffer(imageFile);
+        } else {
+            ipcRenderer.send('save-entry', { formData });
+        }
+    }
   
     function getFormData() {
-      return {
-        Id: loadedData[selectedIndex]?.Id || crypto.randomUUID(),
-        PathOfImage: loadedData[selectedIndex]?.PathOfImage || "",
-        Title: document.getElementById('name').value,
-        AltText: document.getElementById('alt').value,
-        Description: document.getElementById('caption').value,
-        CreationDate: document.getElementById('creation-date').value,
-        Categories: Array.from(document.querySelectorAll('input[name="categories"]:checked')).map(cb => cb.value),
-        Characters: Array.from(document.querySelectorAll('input[name="characters"]:checked')).map(cb => cb.value),
-        Medium: document.querySelector('input[name="medium"]:checked')?.value || '',
-        NeedsTriggerWarning: document.getElementById('trigger-warning').checked,
-        YouTubeLink: document.getElementById('youtube-link').value,
-        SpotifyLink: document.getElementById('spotify-link').value
-      };
+        return {
+            Id: loadedData[selectedIndex]?.Id || crypto.randomUUID(),
+            PathOfImage: currentImageFile ? preview.src : currentImagePath,  // leave blank if uploading a new image
+            Title: document.getElementById('name').value,
+            AltText: document.getElementById('alt').value,
+            Description: document.getElementById('caption').value,
+            CreationDate: document.getElementById('creation-date').value,
+            Categories: Array.from(document.querySelectorAll('input[name="categories"]:checked')).map(cb => cb.value),
+            Characters: Array.from(document.querySelectorAll('input[name="characters"]:checked')).map(cb => cb.value),
+            Medium: document.querySelector('input[name="medium"]:checked')?.value || '',
+            NeedsTriggerWarning: document.getElementById('trigger-warning').checked,
+            YouTubeLink: document.getElementById('youtube-link').value,
+            SpotifyLink: document.getElementById('spotify-link').value
+        };
     }
   
     function setFormData(data) {
@@ -194,6 +237,18 @@
       document.getElementById('trigger-warning').checked = data.NeedsTriggerWarning || false;
       document.getElementById('youtube-link').value = data.YouTubeLink || '';
       document.getElementById('spotify-link').value = data.SpotifyLink || '';
+
+      if (data.PathOfImage) {
+        preview.src = data.PathOfImage;
+        preview.style.display = 'block';
+        currentImagePath = data.PathOfImage;
+        currentImageFile = null;
+      } else {
+        preview.src = '#';
+        preview.style.display = 'none';
+        currentImagePath = '';
+        currentImageFile = null;
+      }
     }
   
     function clearFields() {
@@ -203,7 +258,7 @@
       imageInput.value = '';
       selectedIndex = -1;
     }
-  
+
     function saveJSON() {
       const formData = getFormData();
       if (selectedIndex >= 0) {
@@ -228,8 +283,8 @@
       if (Array.isArray(loadedData) && loadedData.length > 0) {
         selectedIndex = 0;
         setFormData(loadedData[0]);
-        renderEntryList();
       }
+      renderEntryList();
     }
   
     document.getElementById('json-loader').addEventListener('change', function () {
