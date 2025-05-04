@@ -7,7 +7,11 @@ function createMainWindow() {
 	const mainWindow = new BrowserWindow({
 		title: 'Image Formatter',
 		width: 1000,
-		height: 600
+		height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+            preload: path.join(__dirname, 'preload.js')
+        }
 	});
 
     const startUrl = url.format({
@@ -18,41 +22,50 @@ function createMainWindow() {
     mainWindow.loadURL(startUrl);
 }
 
-let jsonData = [];
 
-ipcMain.on('save-entry', async (event, { formData, imageBuffer, imageName }) => {
-  try {
-    const { canceled, filePath } = await dialog.showSaveDialog({
-      title: 'Save Entry Folder',
-      buttonLabel: 'Save',
-      defaultPath: 'image-data',
-      properties: ['createDirectory', 'showOverwriteConfirmation']
-    });
-
-    if (canceled) return;
-
-    const dir = filePath.replace(/\.json$/, ''); // remove `.json` if present
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-
-    const imagesDir = path.join(dir, 'images');
-    if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir);
-
-    if (imageBuffer && imageName) {
-      const imagePath = path.join(imagesDir, imageName);
-      fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
-      formData.PathOfImage = `./images/${imageName}`;
-    }
-
-    // Save JSON entry
-    jsonData.push(formData);
-    const jsonPath = path.join(dir, 'image-metadata.json');
-    fs.writeFileSync(jsonPath, JSON.stringify(jsonData, null, 2));
-
-    event.sender.send('save-success', 'Data saved successfully!');
-  } catch (err) {
-    console.error('Failed to save:', err);
-    event.sender.send('save-failure', err.message);
-  }
+app.whenReady().then(() => {
+    ipcMain.on('save-entry', async (event, { formData, imageBuffer, imageName }) => {
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        const { canceled, filePaths } = await dialog.showOpenDialog({
+          title: 'Choose folder to save your files',
+          properties: ['openDirectory'],
+        });
+      
+        if (canceled) return;
+      
+        const baseDir = filePaths[0];
+        const imagesDir = path.join(baseDir, 'images');
+        const jsonPath = path.join(baseDir, 'image-metadata.json');
+      
+        if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
+      
+        // Write image if present
+        if (imageBuffer && imageName) {
+          const imgPath = path.join(imagesDir, imageName);
+          fs.writeFileSync(imgPath, Buffer.from(imageBuffer));
+          formData.PathOfImage = path.join(imagesDir, imageName); // Absolute path
+        }
+      
+        let data = [];
+        if (fs.existsSync(jsonPath)) {
+          try {
+            data = JSON.parse(fs.readFileSync(jsonPath));
+          } catch (err) {
+            console.error('Failed to read existing JSON:', err);
+          }
+        }
+      
+        // Update or insert formData
+        const existingIndex = data.findIndex(item => item.Id === formData.Id);
+        if (existingIndex !== -1) {
+          data[existingIndex] = formData;
+        } else {
+          data.push(formData);
+        }
+      
+        fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2));
+      
+        event.sender.send('save-success', 'Saved!');
+      });
+    createMainWindow();
 });
-
-app.whenReady().then(createMainWindow);
