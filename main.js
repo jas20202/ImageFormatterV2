@@ -1,5 +1,6 @@
 const { ipcMain, dialog, app, BrowserWindow } = require('electron');
 const path = require('path');
+const sharp = require('sharp');
 const url = require('url');
 const fs = require('fs');
 
@@ -35,15 +36,24 @@ app.whenReady().then(() => {
       
         const baseDir = filePaths[0];
         const imagesDir = path.join(baseDir, 'images');
+        const thumbsDir = path.join(baseDir, 'thumbnails');
         const jsonPath = path.join(baseDir, 'image-metadata.json');
       
         if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
+        if (!fs.existsSync(thumbsDir)) fs.mkdirSync(thumbsDir, { recursive: true });
       
         // Write image if present
         if (imageBuffer && imageName) {
           const imgPath = path.join(imagesDir, imageName);
+          console.log(imgPath);
           fs.writeFileSync(imgPath, Buffer.from(imageBuffer));
-          formData.PathOfImage = path.join(imagesDir, imageName); // Absolute path
+
+          const thumbPath = path.join(thumbsDir, imageName);
+          await sharp(Buffer.from(imageBuffer))
+            .resize({ height: 200 }) // Or height, or both
+            .toFile(thumbPath);
+
+          formData.PathOfImage = path.join('images', imageName); // Absolute path
         }
       
         let data = [];
@@ -66,6 +76,7 @@ app.whenReady().then(() => {
         fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2));
       
         event.sender.send('save-success', 'Saved!');
-      });
+    });
+
     createMainWindow();
 });

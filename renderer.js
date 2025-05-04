@@ -6,10 +6,12 @@ let loadedData = [];
 let selectedIndex = -1;
 let currentImageFile = null;  // Store current uploaded file
 let currentImagePath = '';    // Store original path (e.g., from JSON)
+let basePath = '';
 
 imageInput.addEventListener('change', function () {
     const file = this.files[0];
     if (file) {
+        console.log(file); 
         const reader = new FileReader();
         reader.onload = function (e) {
             preview.src = e.target.result;
@@ -89,17 +91,10 @@ function setFormData(data) {
     document.getElementById('spotify-link').value = data.SpotifyLink || '';
 
     if (data.PathOfImage) {
-        // Build full path to image
-        /* const imagePath = path.join(__dirname, data.PathOfImage); // Adjust as needed
-        preview.src = `file://${imagePath}`;
+        const fullPath = electronAPI.joinPath(basePath, data.PathOfImage);
+        console.log(fullPath);
+        preview.src = `file://${fullPath}`;
         preview.style.display = 'block';
-        currentImagePath = data.PathOfImage;
-        currentImageFile = null;
-        } else {
-        preview.src = '#';
-        preview.style.display = 'none';
-        currentImagePath = '';
-        currentImageFile = null; */
     }
 }
 
@@ -111,52 +106,30 @@ function clearFields() {
     selectedIndex = -1;
 }
 
-/* function saveJSON() {
-    const formData = getFormData();
-    if (selectedIndex >= 0) {
-    loadedData[selectedIndex] = formData;
-    } else {
-    loadedData.push(formData);
-    selectedIndex = loadedData.length - 1;
-    }
-
-    const blob = new Blob([JSON.stringify(loadedData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'image-metadata.json';
-    a.click();
-    URL.revokeObjectURL(url);
-    renderEntryList();
-} */
-
 function loadJSON() {
     document.getElementById('json-loader').click();
-    if (Array.isArray(loadedData) && loadedData.length > 0) {
-    selectedIndex = 0;
-    setFormData(loadedData[0]);
-    }
-    renderEntryList();
 }
 
-document.getElementById('json-loader').addEventListener('change', function () {
+document.getElementById('json-loader').addEventListener('change', function () { 
     const file = this.files[0];
+    basePath = filePaths[0];
     if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-        loadedData = JSON.parse(e.target.result);
-        if (Array.isArray(loadedData) && loadedData.length > 0) {
-            selectedIndex = 0;
-            setFormData(loadedData[0]);
-        } else {
-            alert("JSON is not a valid array or is empty.");
-        }
-        } catch (err) {
-        alert("Error parsing JSON: " + err.message);
-        }
-    };
-    reader.readAsText(file);
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                loadedData = JSON.parse(e.target.result);
+                if (Array.isArray(loadedData) && loadedData.length > 0) {
+                    selectedIndex = 0;
+                    setFormData(loadedData[0]);
+                } else {
+                    alert("JSON is not a valid array or is empty.");
+                }
+            } catch (err) {
+                alert("Error parsing JSON: " + err.message);
+            }
+        };
+        reader.readAsText(file);
+        renderEntryList();
     }
 });
 
@@ -186,13 +159,13 @@ function renderEntryList() {
         div.style.padding = '5px';
         div.style.borderBottom = '1px solid #eee';
         if (index === selectedIndex) {
-        div.style.backgroundColor = '#ddeeff';
+            div.style.backgroundColor = '#ddeeff';
         }
 
         div.addEventListener('click', () => {
-        selectedIndex = index;
-        setFormData(entry);
-        renderEntryList();
+            selectedIndex = index;
+            setFormData(entry);
+            renderEntryList();
         });
 
         listContainer.appendChild(div);

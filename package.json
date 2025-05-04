@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/jas20202/ImageFormatterV2#readme",
   "dependencies": {
-    "electron": "^36.1.0"
+    "electron": "^36.1.0",
+    "sharp": "^0.34.1"
   }
 }
