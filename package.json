@@ -1,0 +1,28 @@
+{
+  "name": "imageformatter",
+  "version": "2.0.0",
+  "description": "Tool to add metadata to images",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "npx electronmon --trace-warnings ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jas20202/ImageFormatterV2.git"
+  },
+  "keywords": [
+    "images",
+    "metadata",
+    "json"
+  ],
+  "author": "Jas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jas20202/ImageFormatterV2/issues"
+  },
+  "homepage": "https://github.com/jas20202/ImageFormatterV2#readme",
+  "dependencies": {
+    "electron": "^36.1.0"
+  }
+}
