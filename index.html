@@ -5,133 +5,254 @@
   <title>Image Formatter</title>
   <style>
     body {
-        font-family: Arial, sans-serif;
-        padding: 30px;
-        max-width: 600px;
-        margin: auto;
+      font-family: Arial, sans-serif;
+      display: flex;
+      padding: 30px;
+      margin: 0;
+    }
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+    .toolbar button {
+      padding: 10px 15px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .main-content {
+      flex: 1;
+      padding-left: 30px;
+      max-width: 600px;
+      margin: auto;
     }
     label {
-        display: block;
-        margin-top: 15px;
-        font-weight: bold;
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
     }
     input[type="text"],
     input[type="date"],
     select,
     textarea {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
     }
     .checkbox-group, .radio-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
     }
     .checkbox-group label, .radio-group label {
-        font-weight: normal;
+      font-weight: normal;
     }
     .form-group {
-        margin-bottom: 20px;
+      margin-bottom: 20px;
     }
     #image-preview {
-        margin-top: 15px;
-        max-width: 100%;
-        height: auto;
-        display: none;
-        border: 1px solid #ccc;
-        padding: 5px;
+      margin-top: 15px;
+      max-width: 100%;
+      height: auto;
+      display: none;
+      border: 1px solid #ccc;
+      padding: 5px;
     }
-    button {
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 16px;
+    button[type="submit"] {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h1>Upload Image with Metadata</h1>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button onclick="saveJSON()">Save JSON File</button>
+    <button onclick="loadJSON()">Load JSON File</button>
+    <input type="file" id="json-loader" accept=".json" style="display: none;" />
+    <button onclick="clearFields()">Clear Fields</button>
+    <button onclick="deleteEntry()">Delete Entry</button>
+  </div>
+
+  <!-- Main Form Content -->
+  <div class="main-content">
+    <h1>Upload Image with Metadata</h1>
     <div class="form-group">
-        <label for="image">Select Image:</label>
-        <input type="file" id="image" name="image" accept="image/*" required>
-        <img id="image-preview" src="#" alt="Image Preview">
+      <label for="image">Select Image:</label>
+      <input type="file" id="image" name="image" accept="image/*" required>
+      <img id="image-preview" src="#" alt="Image Preview">
     </div>
 
     <div class="form-group">
-        <label for="name">Image Name:</label>
-        <input type="text" id="name" name="name" required>
+      <label for="name">Image Name:</label>
+      <input type="text" id="name" name="name" required>
     </div>
 
     <div class="form-group">
-        <label for="alt">Alt Text:</label>
-        <input type="text" id="alt" name="alt" required>
+      <label for="alt">Alt Text:</label>
+      <input type="text" id="alt" name="alt" required>
     </div>
 
     <div class="form-group">
-        <label for="caption">Caption:</label>
-        <textarea id="caption" name="caption" rows="3"></textarea>
+      <label for="caption">Caption:</label>
+      <textarea id="caption" name="caption" rows="3"></textarea>
     </div>
 
     <div class="form-group">
-        <label>Categories:</label>
-        <div class="checkbox-group">
+      <label>Categories:</label>
+      <div class="checkbox-group">
         <label><input type="checkbox" name="categories" value="Nature"> Nature</label>
         <label><input type="checkbox" name="categories" value="Urban"> Urban</label>
         <label><input type="checkbox" name="categories" value="Portrait"> Portrait</label>
         <label><input type="checkbox" name="categories" value="Abstract"> Abstract</label>
-        </div>
+      </div>
     </div>
 
     <div class="form-group">
-        <label>Characters:</label>
-        <div class="checkbox-group">
+      <label>Characters:</label>
+      <div class="checkbox-group">
         <label><input type="checkbox" name="characters" value="Person A"> Person A</label>
         <label><input type="checkbox" name="characters" value="Person B"> Person B</label>
         <label><input type="checkbox" name="characters" value="Animal"> Animal</label>
-        </div>
+      </div>
     </div>
 
     <div class="form-group">
-        <label>Medium:</label>
-        <div class="radio-group">
+      <label>Medium:</label>
+      <div class="radio-group">
         <label><input type="radio" name="medium" value="Photography" required> Photography</label>
         <label><input type="radio" name="medium" value="Illustration"> Illustration</label>
         <label><input type="radio" name="medium" value="Digital Art"> Digital Art</label>
-        </div>
+      </div>
     </div>
 
     <div class="form-group">
-        <label for="creation-date">Date of Creation:</label>
-        <input type="date" id="creation-date" name="creation_date">
+      <label for="creation-date">Date of Creation:</label>
+      <input type="date" id="creation-date" name="creation_date">
     </div>
 
     <div class="form-group">
-        <label for="trigger-warning">Trigger Warning:</label>
-        <input type="checkbox" id="trigger-warning" name="trigger_warning">
+        <label for="youtube-link">YouTube Link:</label>
+        <input type="text" id="youtube-link" name="youtube_link">
+    </div>
+    
+    <div class="form-group">
+        <label for="spotify-link">Spotify Link:</label>
+        <input type="text" id="spotify-link" name="spotify_link">
+    </div>      
+
+    <div class="form-group">
+      <label for="trigger-warning">Trigger Warning:</label>
+      <input type="checkbox" id="trigger-warning" name="trigger_warning">
     </div>
 
     <button type="submit">Upload</button>
+  </div>
 
   <script>
-    const imageInput = document.getElementById('image');
-    const preview = document.getElementById('image-preview');
-
-    imageInput.addEventListener('change', function () {
+    let loadedData = [];
+    let selectedIndex = -1;
+  
+    function getFormData() {
+      return {
+        Id: loadedData[selectedIndex]?.Id || crypto.randomUUID(),
+        PathOfImage: loadedData[selectedIndex]?.PathOfImage || "",
+        Title: document.getElementById('name').value,
+        AltText: document.getElementById('alt').value,
+        Description: document.getElementById('caption').value,
+        CreationDate: document.getElementById('creation-date').value,
+        Categories: Array.from(document.querySelectorAll('input[name="categories"]:checked')).map(cb => cb.value),
+        Characters: Array.from(document.querySelectorAll('input[name="characters"]:checked')).map(cb => cb.value),
+        Medium: document.querySelector('input[name="medium"]:checked')?.value || '',
+        NeedsTriggerWarning: document.getElementById('trigger-warning').checked,
+        YouTubeLink: document.getElementById('youtube-link').value,
+        SpotifyLink: document.getElementById('spotify-link').value
+      };
+    }
+  
+    function setFormData(data) {
+      document.getElementById('name').value = data.Title || '';
+      document.getElementById('alt').value = data.AltText || '';
+      document.getElementById('caption').value = data.Description || '';
+      document.querySelectorAll('input[name="categories"]').forEach(cb => cb.checked = data.Categories?.includes(cb.value));
+      document.querySelectorAll('input[name="characters"]').forEach(cb => cb.checked = data.Characters?.includes(cb.value));
+      document.querySelectorAll('input[name="medium"]').forEach(rb => rb.checked = (rb.value === data.Medium));
+      document.getElementById('creation-date').value = data.CreationDate || '';
+      document.getElementById('trigger-warning').checked = data.NeedsTriggerWarning || false;
+      document.getElementById('youtube-link').value = data.YouTubeLink || '';
+      document.getElementById('spotify-link').value = data.SpotifyLink || '';
+    }
+  
+    function clearFields() {
+      setFormData({});
+      preview.setAttribute('src', '#');
+      preview.style.display = 'none';
+      imageInput.value = '';
+      selectedIndex = -1;
+    }
+  
+    function saveJSON() {
+      const formData = getFormData();
+      if (selectedIndex >= 0) {
+        loadedData[selectedIndex] = formData;
+      } else {
+        loadedData.push(formData);
+        selectedIndex = loadedData.length - 1;
+      }
+  
+      const blob = new Blob([JSON.stringify(loadedData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'image-metadata.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  
+    function loadJSON() {
+      document.getElementById('json-loader').click();
+    }
+  
+    document.getElementById('json-loader').addEventListener('change', function () {
       const file = this.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function (e) {
-          preview.setAttribute('src', e.target.result);
-          preview.style.display = 'block';
+          try {
+            loadedData = JSON.parse(e.target.result);
+            if (Array.isArray(loadedData) && loadedData.length > 0) {
+              selectedIndex = 0;
+              setFormData(loadedData[0]);
+            } else {
+              alert("JSON is not a valid array or is empty.");
+            }
+          } catch (err) {
+            alert("Error parsing JSON: " + err.message);
+          }
         };
-        reader.readAsDataURL(file);
-      } else {
-        preview.setAttribute('src', '#');
-        preview.style.display = 'none';
+        reader.readAsText(file);
       }
     });
-  </script>
+  
+    function deleteEntry() {
+      if (selectedIndex >= 0 && confirm("Delete this entry?")) {
+        loadedData.splice(selectedIndex, 1);
+        if (loadedData.length > 0) {
+          selectedIndex = 0;
+          setFormData(loadedData[0]);
+        } else {
+          clearFields();
+          loadedData = [];
+        }
+      }
+    }
+  </script>  
+
 </body>
 </html>
-
