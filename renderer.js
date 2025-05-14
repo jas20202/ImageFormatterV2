@@ -26,6 +26,7 @@ imageInput.addEventListener('change', function () {
 }); 
 
 function getFormData() {
+    console.log('saving... ' + currentImageFile)
     return {
         Id: loadedData[selectedIndex]?.Id || crypto.randomUUID(),
         PathOfImage: currentImageFile ? preview.src : currentImagePath,  // leave blank if uploading a new image

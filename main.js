@@ -51,48 +51,64 @@ app.whenReady().then(() => {
     
       if (canceled) return;
     
-      const baseDir = filePaths[0];
-      const imagesDir = path.join(baseDir, 'images');
-      const thumbsDir = path.join(baseDir, 'thumbnails');
-      const jsonPath = path.join(baseDir, 'image-metadata.json');
+      try {
+        const baseDir = filePaths[0]; // Example directory path
+        const imagesDir = path.join(baseDir, 'images');
+        const thumbsDir = path.join(baseDir, 'thumbnails');
+        const jsonPath = path.join(baseDir, 'image-metadata.json');
     
-      if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
-      if (!fs.existsSync(thumbsDir)) fs.mkdirSync(thumbsDir, { recursive: true });
-    
-      // Write image if present
-      if (imageBuffer && imageName) {
-        const imgPath = path.join(imagesDir, imageName);
-        console.log(imgPath);
-        fs.writeFileSync(imgPath, Buffer.from(imageBuffer));
-
-        const thumbPath = path.join(thumbsDir, imageName);
-        await sharp(Buffer.from(imageBuffer))
-          .resize({ height: 200 }) // Or height, or both
-          .toFile(thumbPath);
-
-        formData.PathOfImage = path.join('images', imageName); // Absolute path
-      }
-    
-      let data = [];
-      if (fs.existsSync(jsonPath)) {
+        // Check if directories exist, if not create them
         try {
-          data = JSON.parse(fs.readFileSync(jsonPath));
+          await fs.access(imagesDir);
+        } catch (err) {
+          console.log('Creating images directory');
+          await fs.mkdir(imagesDir, { recursive: true });
+        }
+    
+        try {
+          await fs.access(thumbsDir);
+        } catch (err) {
+          console.log('Creating thumbnails directory');
+          await fs.mkdir(thumbsDir, { recursive: true });
+        }
+    
+        // Write image if present
+        if (imageBuffer && imageName) {
+          const imgPath = path.join(imagesDir, imageName);
+          console.log('Saving image to:', imgPath);
+          await fs.writeFile(imgPath, imageBuffer); // Using promises version of writeFile
+    
+          // Assuming you're using `sharp` to generate thumbnails
+          const thumbPath = path.join(thumbsDir, imageName);
+          await sharp(Buffer.from(imageBuffer))
+            .resize({ height: 200 })
+            .toFile(thumbPath);
+    
+          formData.PathOfImage = path.join('images', imageName); // Update image path
+        }
+    
+        // Read and update JSON metadata
+        let data = [];
+        try {
+          data = JSON.parse(await fs.readFile(jsonPath, 'utf8'));
         } catch (err) {
           console.error('Failed to read existing JSON:', err);
         }
+    
+        // Update or insert formData
+        const existingIndex = data.findIndex(item => item.Id === formData.Id);
+        if (existingIndex !== -1) {
+          data[existingIndex] = formData; // Replace existing entry
+        } else {
+          data.push(formData); // Add new entry
+        }
+    
+        // Save updated data to JSON
+        await fs.writeFile(jsonPath, JSON.stringify(data, null, 2));
+        console.log('Metadata saved successfully');
+      } catch (err) {
+        console.error('Error saving entry:', err);
       }
-    
-      // Update or insert formData
-      const existingIndex = data.findIndex(item => item.Id === formData.Id);
-      if (existingIndex !== -1) {
-        data[existingIndex] = formData;
-      } else {
-        data.push(formData);
-      }
-    
-      fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2));
-    
-      event.sender.send('save-success', 'Saved!');
   });
 
   createMainWindow();
