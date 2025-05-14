@@ -1,12 +1,9 @@
 const imageInput = document.getElementById('image');
-const saveJsonButton = document.getElementById('saveJSON');
 const preview = document.getElementById('image-preview');
 
-let loadedData = [];
 let selectedIndex = -1;
 let currentImageFile = null;  // Store current uploaded file
 let currentImagePath = '';    // Store original path (e.g., from JSON)
-let basePath = '';
 
 imageInput.addEventListener('change', function () {
     const file = this.files[0];
@@ -27,39 +24,6 @@ imageInput.addEventListener('change', function () {
         currentImagePath = '';
     }
 }); 
-
-saveJsonButton.addEventListener('click', function () {
-    console.log("I was clicked");
-    const formData = getFormData();
-    if (selectedIndex >= 0) {
-        loadedData[selectedIndex] = formData;
-    } else {
-        loadedData.push(formData);
-        selectedIndex = loadedData.length - 1;
-    }
-
-    // Delegate saving to main process via IPC
-    saveEntryWithImage(formData, currentImageFile);
-    renderEntryList();
-});
-
-function saveEntryWithImage(formData, imageFile) {
-    const fileReader = new FileReader();
-    fileReader.onload = function (e) {
-        // Send everything to the main process
-        electronAPI.saveEntry({
-            formData,
-            imageBuffer: e.target.result,
-            imageName: `${formData.Id}.png`
-        });
-    };
-
-    if (imageFile) {
-        fileReader.readAsArrayBuffer(imageFile);
-    } else {
-        electronAPI.saveEntry({ formData });
-    }
-}
 
 function getFormData() {
     return {
@@ -92,9 +56,9 @@ function setFormData(data) {
 
     if (data.PathOfImage) {
         const fullPath = electronAPI.joinPath(basePath, data.PathOfImage);
-        console.log(fullPath);
         preview.src = `file://${fullPath}`;
         preview.style.display = 'block';
+        currentImagePath = data.PathOfImage;
     }
 }
 
@@ -106,43 +70,16 @@ function clearFields() {
     selectedIndex = -1;
 }
 
-function loadJSON() {
-    document.getElementById('json-loader').click();
-}
-
-document.getElementById('json-loader').addEventListener('change', function () { 
-    const file = this.files[0];
-    basePath = filePaths[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                loadedData = JSON.parse(e.target.result);
-                if (Array.isArray(loadedData) && loadedData.length > 0) {
-                    selectedIndex = 0;
-                    setFormData(loadedData[0]);
-                } else {
-                    alert("JSON is not a valid array or is empty.");
-                }
-            } catch (err) {
-                alert("Error parsing JSON: " + err.message);
-            }
-        };
-        reader.readAsText(file);
-        renderEntryList();
-    }
-});
-
 function deleteEntry() {
     if (selectedIndex >= 0 && confirm("Delete this entry?")) {
-    loadedData.splice(selectedIndex, 1);
-    if (loadedData.length > 0) {
-        selectedIndex = 0;
-        setFormData(loadedData[0]);
-    } else {
-        clearFields();
-        loadedData = [];
-    }
+        loadedData.splice(selectedIndex, 1);
+        if (loadedData.length > 0) {
+            selectedIndex = 0;
+            setFormData(loadedData[0]);
+        } else {
+            clearFields();
+            loadedData = [];
+        }
     }
     renderEntryList();
 }
