@@ -8,13 +8,13 @@ let currentImagePath = '';    // Store original path (e.g., from JSON)
 imageInput.addEventListener('change', function () {
     const file = this.files[0];
     if (file) {
-        console.log(file); 
         const reader = new FileReader();
         reader.onload = function (e) {
             preview.src = e.target.result;
             preview.style.display = 'block';
             currentImageFile = file;
             currentImagePath = ""; // clear previous path
+            console.log("inserting... " + currentImageFile);
         };
         reader.readAsDataURL(file); 
     } else {
@@ -22,6 +22,7 @@ imageInput.addEventListener('change', function () {
         preview.style.display = 'none';
         currentImageFile = null;
         currentImagePath = '';
+        console.log("none selected... " + currentImageFile);
     }
 }); 
 
@@ -29,7 +30,7 @@ function getFormData() {
     console.log('saving... ' + currentImageFile)
     return {
         Id: loadedData[selectedIndex]?.Id || crypto.randomUUID(),
-        PathOfImage: currentImageFile ? preview.src : currentImagePath,  // leave blank if uploading a new image
+        PathOfImage: currentImageFile ? '': currentImagePath,  // leave blank if uploading a new image
         Title: document.getElementById('name').value,
         AltText: document.getElementById('alt').value,
         Description: document.getElementById('caption').value,
@@ -43,7 +44,7 @@ function getFormData() {
     };
 }
  
-function setFormData(data) {
+async function setFormData(data) {
     document.getElementById('name').value = data.Title || '';
     document.getElementById('alt').value = data.AltText || '';
     document.getElementById('caption').value = data.Description || '';
@@ -60,6 +61,7 @@ function setFormData(data) {
         preview.src = `file://${fullPath}`;
         preview.style.display = 'block';
         currentImagePath = data.PathOfImage;
+        currentImageFile = null;
     }
 }
 
@@ -69,6 +71,9 @@ function clearFields() {
     preview.style.display = 'none';
     imageInput.value = '';
     selectedIndex = -1;
+    currentImageFile = null;
+    currentImagePath = "";
+    console.log("clearing... " + currentImageFile);
 }
 
 function deleteEntry() {

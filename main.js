@@ -76,7 +76,7 @@ app.whenReady().then(() => {
         if (imageBuffer && imageName) {
           const imgPath = path.join(imagesDir, imageName);
           console.log('Saving image to:', imgPath);
-          await fs.writeFile(imgPath, imageBuffer); // Using promises version of writeFile
+          await fs.writeFile(imgPath, Buffer.from(imageBuffer)); // Using promises version of writeFile
     
           // Assuming you're using `sharp` to generate thumbnails
           const thumbPath = path.join(thumbsDir, imageName);
@@ -92,7 +92,7 @@ app.whenReady().then(() => {
         try {
           data = JSON.parse(await fs.readFile(jsonPath, 'utf8'));
         } catch (err) {
-          console.error('Failed to read existing JSON:', err);
+          console.error('Failed to read existing JSON.');
         }
     
         // Update or insert formData

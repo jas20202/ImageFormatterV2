@@ -5,6 +5,7 @@ let loadedData = [];
 saveJsonButton.addEventListener('click', function () {
     console.log("I was clicked");
     const formData = getFormData();
+
     if (selectedIndex >= 0) {
         loadedData[selectedIndex] = formData;
     } else {
@@ -20,6 +21,7 @@ saveJsonButton.addEventListener('click', function () {
 function saveEntryWithImage(formData, imageFile) {
     const fileReader = new FileReader();
     fileReader.onload = function (e) {
+        console.log(e);
         // Send everything to the main process
         electronAPI.saveEntry({
             formData,
