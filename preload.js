@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  saveEntry: (data) => ipcRenderer.send('save-entry', data),
+  saveEntry: (data) => ipcRenderer.invoke('save-entry', data),
   onSaveSuccess: (callback) => ipcRenderer.on('save-success', (e, msg) => callback(msg)),
   
   openFile: () => ipcRenderer.invoke('dialog:openFile'),

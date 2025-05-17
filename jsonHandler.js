@@ -3,7 +3,7 @@ let basePath = '';
 let loadedData = [];
 
 saveJsonButton.addEventListener('click', function () {
-    console.log("I was clicked");
+    console.log("BasePath: " + basePath);
     const formData = getFormData();
 
     if (selectedIndex >= 0) {
@@ -18,22 +18,23 @@ saveJsonButton.addEventListener('click', function () {
     renderEntryList();
 });
 
-function saveEntryWithImage(formData, imageFile) {
+async function saveEntryWithImage(formData, imageFile) {
     const fileReader = new FileReader();
-    fileReader.onload = function (e) {
+    fileReader.onload = async function (e) {
         console.log(e);
         // Send everything to the main process
-        electronAPI.saveEntry({
+        basePath = await electronAPI.saveEntry({
             formData,
             imageBuffer: e.target.result,
-            imageName: `${formData.Id}.png`
+            imageName: `${formData.Id}.png`,
+            basePath
         });
     };
 
     if (imageFile) {
         fileReader.readAsArrayBuffer(imageFile);
     } else {
-        electronAPI.saveEntry({ formData });
+        basePath = await electronAPI.saveEntry({ formData });
     }
 }
 

@@ -1,33 +1,8 @@
-const imageInput = document.getElementById('image');
-const preview = document.getElementById('image-preview');
-
 let selectedIndex = -1;
-let currentImageFile = null;  // Store current uploaded file
-let currentImagePath = '';    // Store original path (e.g., from JSON)
-
-imageInput.addEventListener('change', function () {
-    const file = this.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-            currentImageFile = file;
-            currentImagePath = ""; // clear previous path
-            console.log("inserting... " + currentImageFile);
-        };
-        reader.readAsDataURL(file); 
-    } else {
-        preview.src = '#';
-        preview.style.display = 'none';
-        currentImageFile = null;
-        currentImagePath = '';
-        console.log("none selected... " + currentImageFile);
-    }
-}); 
 
 function getFormData() {
-    console.log('saving... ' + currentImageFile)
+    console.log('saving... ' + currentImageFile);
+    console.log('path... ' + currentImagePath);
     return {
         Id: loadedData[selectedIndex]?.Id || crypto.randomUUID(),
         PathOfImage: currentImageFile ? '': currentImagePath,  // leave blank if uploading a new image
@@ -57,11 +32,7 @@ async function setFormData(data) {
     document.getElementById('spotify-link').value = data.SpotifyLink || '';
 
     if (data.PathOfImage) {
-        const fullPath = electronAPI.joinPath(basePath, data.PathOfImage);
-        preview.src = `file://${fullPath}`;
-        preview.style.display = 'block';
-        currentImagePath = data.PathOfImage;
-        currentImageFile = null;
+        setImage(data.PathOfImage);
     }
 }
 
@@ -107,6 +78,7 @@ function renderEntryList() {
 
         div.addEventListener('click', () => {
             selectedIndex = index;
+            console.log(entry);
             setFormData(entry);
             renderEntryList();
         });

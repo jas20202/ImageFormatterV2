@@ -42,17 +42,21 @@ app.whenReady().then(() => {
       return data;
   });
 
-  ipcMain.on('save-entry', async (event, { formData, imageBuffer, imageName }) => {
-      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA")
-      const { canceled, filePaths } = await dialog.showOpenDialog({
-        title: 'Choose folder to save your files',
-        properties: ['openDirectory'],
-      });
-    
-      if (canceled) return;
-    
+  ipcMain.handle('save-entry', async (event, { formData, imageBuffer, imageName, basePath }) => {
+      let baseDir = basePath;
+      console.log(baseDir);
+      if(basePath == ''){
+        console.log("Saving new JSON...")
+        const { canceled, filePaths } = await dialog.showOpenDialog({
+          title: 'Choose folder to save your files',
+          properties: ['openDirectory'],
+        });
+        baseDir = filePaths[0]; 
+      
+        if (canceled) return '';
+      }
+
       try {
-        const baseDir = filePaths[0]; // Example directory path
         const imagesDir = path.join(baseDir, 'images');
         const thumbsDir = path.join(baseDir, 'thumbnails');
         const jsonPath = path.join(baseDir, 'image-metadata.json');
@@ -106,6 +110,8 @@ app.whenReady().then(() => {
         // Save updated data to JSON
         await fs.writeFile(jsonPath, JSON.stringify(data, null, 2));
         console.log('Metadata saved successfully');
+        console.log(baseDir);
+        return baseDir;
       } catch (err) {
         console.error('Error saving entry:', err);
       }
