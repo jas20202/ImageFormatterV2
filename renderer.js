@@ -73,7 +73,8 @@ function renderEntryList() {
         div.style.padding = '5px';
         div.style.borderBottom = '1px solid #eee';
         if (index === selectedIndex) {
-            div.style.backgroundColor = '#ddeeff';
+            div.style.backgroundColor = 'var(--color-primary-600)';
+            div.style.color = 'var(--color-surface-mixed-100)';
         }
 
         div.addEventListener('click', () => {
