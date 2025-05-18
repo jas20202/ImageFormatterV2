@@ -64,46 +64,78 @@
   }
   
   
-  body {
+  
+/* Reset & Base Styles */
+* {
+    box-sizing: border-box;
     margin: 0;
-    padding-right: 30px;
+    padding: 0;
+  }
+  
+  body {
+    height: 100vh;
     display: flex;
     font-family: Arial, sans-serif;
     background-color: var(--color-surface-100);
     color: var(--text-100);
+    overflow: hidden; /* Prevent scrollbars */
   }
-  
+
+  /* Toolbar - Left Sidebar */
   .toolbar {
+    background-color: var(--color-surface-200);
+    padding: 1em;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 0.5em;
-    border-right: 1px solid #ccc;
+    border-right: 1px solid var(--color-surface-400);
   }
   
+  .toolbar button {
+    background: none;
+    border: none;
+    color: var(--text-100);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .toolbar button:hover {
+    background-color: var(--color-surface-mixed-200);
+    border-radius: 4px;
+  }
+  
+  /* Entries List Styling */
   .entry-list {
     flex: 1;
     overflow-y: auto;
-    max-height: 400px;
-    border: none;
-    padding: 5px;
+    margin-top: 10px;
+    padding-right: 5px;
+    border-top: 1px solid var(--color-surface-400);
+    padding-top: 10px;
   }
   
+  /* Main Form Content */
   .main-content {
     flex: 1;
-    padding-left: 30px;
-    max-width: 600px;
-    margin: auto;
+    padding: 2em;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
   
   .form-group {
     margin-bottom: 20px;
   }
   
+  /* Label & Input Styling */
   label {
     display: block;
-    margin-top: 15px;
     font-weight: bold;
+    margin-bottom: 6px;
   }
   
   input[type="text"],
@@ -111,17 +143,18 @@
   textarea {
     width: 100%;
     padding: 8px;
-    margin-top: 5px;
     background: var(--color-surface-200);
     color: var(--accent-100);
+    border: 1px solid var(--color-surface-400);
+    border-radius: 4px;
   }
   
+  /* Grouped Input Elements */
   .checkbox-group,
   .radio-group {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 5px;
   }
   
   .checkbox-group label,
@@ -129,25 +162,58 @@
     font-weight: normal;
   }
   
+  /* Image Preview */
   #image-preview {
-    margin-top: 15px;
+    margin-top: 10px;
     max-width: 100%;
     height: auto;
     display: none;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-surface-400);
     padding: 5px;
-  }
-  
-  button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    background: none;
-    color: var(--text-100);
-    border-radius: 5px;
+    border-radius: 4px;
   }
 
+  #entry-name {
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+  }
+
+  #entry-name:hover {
+    background-color: var(--color-surface-mixed-200)
+  }
+  
+  /* Button Styles */
+  button {
+    font-size: 14px;
+    padding: 2em;
+    height: 5em;
+    margin-bottom: 1em;
+    background-color: transparent;
+    border: 1px solid var(--color-surface-400);
+    border-radius: 4px;
+    color: var(--text-100);
+    transition: background-color 0.2s;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  
   button:hover {
     background-color: var(--color-surface-mixed-200);
   }
+  
+  /* Scrollbar Styling (optional) */
+  body::-webkit-scrollbar,
+  .toolbar::-webkit-scrollbar,
+  .main-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  body::-webkit-scrollbar-thumb,
+  .toolbar::-webkit-scrollbar-thumb,
+  .main-content::-webkit-scrollbar-thumb {
+    background-color: var(--color-surface-400);
+    border-radius: 10px;
+  }
+  

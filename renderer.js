@@ -69,12 +69,10 @@ function renderEntryList() {
         const div = document.createElement('div');
         div.textContent = entry.Title || `(Untitled #${index + 1})`;
         div.className = 'entry-item';
-        div.style.cursor = 'pointer';
-        div.style.padding = '5px';
-        div.style.borderBottom = '1px solid #eee';
+        div.id = 'entry-name';
         if (index === selectedIndex) {
-            div.style.backgroundColor = 'var(--color-primary-600)';
-            div.style.color = 'var(--color-surface-mixed-100)';
+            div.style.backgroundColor = 'var(--color-primary-100)';
+            div.style.color = 'var(--color-surface-100)';
         }
 
         div.addEventListener('click', () => {
