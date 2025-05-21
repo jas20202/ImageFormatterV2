@@ -44,6 +44,7 @@ function clearFields() {
     selectedIndex = -1;
     currentImageFile = null;
     currentImagePath = "";
+    imageLabel.innerHTML = "Load image";
     console.log("clearing... " + currentImageFile);
 }
 

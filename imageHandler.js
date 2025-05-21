@@ -1,5 +1,6 @@
 const imageInput = document.getElementById('image');
 const preview = document.getElementById('image-preview');
+const imageLabel = document.getElementById('custom-file-upload');
 
 let currentImageFile = null;  // Store current uploaded file
 let currentImagePath = '';    // Store original path (e.g., from JSON)
@@ -11,6 +12,7 @@ function setImage(pathOfImage) {
     currentImagePath = pathOfImage;
     currentImageFile = null;
     console.log(fullPath);
+    imageLabel.innerHTML = "Load image";
 }
 
 imageInput.addEventListener('change', function () {
@@ -22,6 +24,7 @@ imageInput.addEventListener('change', function () {
             preview.src = e.target.result;
             preview.style.display = 'block';
             currentImageFile = file;
+            imageLabel.innerHTML = file.name;
             if(selectedIndex === -1) {
                 currentImagePath = ""; 
             }
