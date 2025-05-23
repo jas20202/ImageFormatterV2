@@ -7,8 +7,8 @@ const fs = require('fs').promises;
 function createMainWindow() {
 	const mainWindow = new BrowserWindow({
 		title: 'Image Formatter',
-		width: 1000,
-		height: 600,
+		width: 1100,
+		height: 650,
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, 'preload.js')
