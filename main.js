@@ -126,10 +126,11 @@ function createMainWindow() {
 		title: 'Image Formatter',
 		width: 1100,
 		height: 650,
-        webPreferences: {
-            nodeIntegration: true,
-            preload: path.join(__dirname, 'preload.js')
-        }
+    icon: path.join(__dirname, 'favicon.png'),
+      webPreferences: {
+          nodeIntegration: true,
+          preload: path.join(__dirname, 'preload.js')
+      }
 	});
 
   const startUrl = url.format({
@@ -145,10 +146,11 @@ function createSettingsWindow() {
 		title: 'Settings',
 		width: 750,
 		height: 420,
-        webPreferences: {
-            nodeIntegration: true,
-            preload: path.join(__dirname, 'preload.js')
-        }
+    icon:'favicon.png',
+      webPreferences: {
+          nodeIntegration: true,
+          preload: path.join(__dirname, 'preload.js')
+      }
 	});
 
   const settingsUrl = url.format({
