@@ -185,7 +185,8 @@ app.whenReady().then(() => {
 
   ipcMain.handle('file:checkIfExists', async (event, filePath) => {
     try {
-      const fileContent = await fs.readFile(filePath, 'utf8');
+      filePath = path.join(__dirname, filePath),
+      await fs.readFile(filePath, 'utf8');
       return true;
     } catch (err) {
       return false;
@@ -194,6 +195,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('file:readCSV', async (event, filePath) => {
     try {
+      filePath = path.join(__dirname, filePath);
       const fileContent = await fs.readFile(filePath, 'utf8');
       data = fileContent.split(',');
     } catch (err) {

@@ -1,12 +1,12 @@
 let selectedIndex = -1;
-const customCharactersPath = "./settings/CustomCharacters.csv";
-const customCategoriesPath = "./settings/CustomCategories.csv";
-const defaultCharactersPath = "./settings/DefaultCharacters.csv";
-const defaultCategoriesPath = "./settings/DefaultCategories.csv";
+const customCharactersPath = "settings/CustomCharacters.csv";
+const customCategoriesPath = "settings/CustomCategories.csv";
+const defaultCharactersPath = "settings/DefaultCharacters.csv";
+const defaultCategoriesPath = "settings/DefaultCategories.csv";
 
 document.addEventListener('DOMContentLoaded', () => {
   loadCharacterList();
-  loadCategoriesList()
+  loadCategoriesList();
 });
 
 async function loadCharacterList() {

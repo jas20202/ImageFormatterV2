@@ -1,8 +1,8 @@
 let data = [];
 let openSettings = ""
 const title = document.getElementById("title");
-const customCharactersPath = "./settings/CustomCharacters.csv";
-const customCategoriesPath = "./settings/CustomCategories.csv";
+const customCharactersPath = "settings/CustomCharacters.csv";
+const customCategoriesPath = "settings/CustomCategories.csv";
 
 document.addEventListener('DOMContentLoaded', () => {
   loadCharacterList();
