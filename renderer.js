@@ -1,4 +1,51 @@
 let selectedIndex = -1;
+const customCharactersPath = "./checkboxes/CustomCharacters.csv";
+const customCategoriesPath = "./checkboxes/CustomCategories.csv";
+const defaultCharactersPath = "./checkboxes/DefaultCharacters.csv";
+const defaultCategoriesPath = "./checkboxes/DefaultCategories.csv";
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadCharacterList();
+  loadCategoriesList()
+});
+
+async function loadCharacterList() {
+    const customExists = await electronAPI.checkIfFileExists(customCharactersPath);
+    let data = []
+    if(customExists) {
+        data = await electronAPI.readCSV(customCharactersPath);
+    }else{
+        data = await electronAPI.readCSV(defaultCharactersPath);
+    }
+    renderCheckboxList('characters-list', data);
+}
+
+async function loadCategoriesList() {
+    const customExists = await electronAPI.checkIfFileExists(customCategoriesPath);
+    let data = []
+    if(customExists) {
+        data = await electronAPI.readCSV(customCategoriesPath);
+    }else{
+        data = await electronAPI.readCSV(defaultCategoriesPath);
+    }
+    renderCheckboxList('categories-list', data);
+}
+
+function renderCheckboxList(id, data) {
+    const listContainer = document.getElementById(id);
+    listContainer.innerHTML = '';
+
+    data.forEach((entry) => {
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.type = "checkbox";
+        input.value = entry;
+        
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(entry));
+        listContainer.appendChild(label);
+    });
+}
 
 function getFormData() {
     console.log('saving... ' + currentImageFile);

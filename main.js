@@ -181,6 +181,15 @@ app.whenReady().then(() => {
       return data;
   });
 
+  ipcMain.handle('file:checkIfExists', async (event, filePath) => {
+    try {
+      const fileContent = await fs.readFile(filePath, 'utf8');
+      return true;
+    } catch (err) {
+      return false;
+    }
+  });
+
   ipcMain.handle('file:readCSV', async (event, filePath) => {
     try {
       const fileContent = await fs.readFile(filePath, 'utf8');

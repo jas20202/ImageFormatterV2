@@ -77,24 +77,17 @@
         <input type="text" id="alt" name="alt" placeholder="Alt text" required />
         <textarea id="caption" name="caption" placeholder="Caption (optional)" rows="3"></textarea>
         
-        <div>
-          <strong>Categories:</strong>
-          <div class="checkbox-list">
-            <!-- Replace with real categories -->
-            <label><input type="checkbox" name="categories" value="Nature" /> Nature</label>
-          <label><input type="checkbox" name="categories" value="Urban" /> Urban</label>
-          <label><input type="checkbox" name="categories" value="Portrait" /> Portrait</label>
-          <label><input type="checkbox" name="categories" value="Abstract" /> Abstract</label>
+      <div>
+        <strong>Categories:</strong>
+        <div class="checkbox-list" id="categories-list">
+            <!-- Populated dynamically -->
         </div>
       </div>
 
       <div>
         <strong>Characters:</strong>
-        <div class="checkbox-list">
-            <!-- Replace with real characters -->
-            <label><input type="checkbox" name="characters" value="Person A" /> Person A</label>
-            <label><input type="checkbox" name="characters" value="Person B" /> Person B</label> 
-            <label><input type="checkbox" name="characters" value="Animal" /> Animal</label>
+        <div class="checkbox-list" id="characters-list">
+            <!-- Populated dynamically -->
           </div>
         </div>
       </div>
