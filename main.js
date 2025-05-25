@@ -1,8 +1,125 @@
-const { ipcMain, dialog, app, BrowserWindow } = require('electron');
+const { ipcMain, dialog, app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
+const { electron } = require('process');
 const sharp = require('sharp');
 const url = require('url');
 const fs = require('fs').promises;
+
+const isMac = process.platform === 'darwin'
+
+const template = [
+  // { role: 'appMenu' }
+  ...(isMac
+    ? [{
+        label: app.name,
+        submenu: [
+          { role: 'about' },
+          { type: 'separator' },
+          { role: 'services' },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideOthers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { role: 'quit' }
+        ]
+      }]
+    : []),
+  // { role: 'fileMenu' }
+  {
+    label: 'File',
+    submenu: [
+      isMac ? { role: 'close' } : { role: 'quit' }
+    ]
+  },
+  // { role: 'editMenu' }
+  {
+    label: 'Edit',
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      ...(isMac
+        ? [
+            { role: 'pasteAndMatchStyle' },
+            { role: 'delete' },
+            { role: 'selectAll' },
+            { type: 'separator' },
+            {
+              label: 'Speech',
+              submenu: [
+                { role: 'startSpeaking' },
+                { role: 'stopSpeaking' }
+              ]
+            }
+          ]
+        : [
+            { role: 'delete' },
+            { type: 'separator' },
+            { role: 'selectAll' }
+          ])
+    ]
+  },
+  // { role: 'viewMenu' }
+  {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forceReload' },
+      { role: 'toggleDevTools' },
+      { type: 'separator' },
+      { role: 'resetZoom' },
+      { role: 'zoomIn' },
+      { role: 'zoomOut' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' }
+    ]
+  },
+  // { role: 'windowMenu' }
+  {
+    label: 'Window',
+    submenu: [
+      { role: 'minimize' },
+      { role: 'zoom' },
+      ...(isMac
+        ? [
+            { type: 'separator' },
+            { role: 'front' },
+            { type: 'separator' },
+            { role: 'window' }
+          ]
+          : [
+            { role: 'close' },
+            { type: 'separator' },
+            {
+              label: 'Settings',
+              click: async () => {
+                const { shell } = require('electron')
+                createSettingsWindow()
+              }
+            }
+          ])
+    ]
+  },
+  {
+    role: 'help',
+    submenu: [
+      {
+        label: 'Learn More',
+        click: async () => {
+          const { shell } = require('electron')
+          await shell.openExternal('https://github.com/jas20202/ImageFormatterV2')
+        }
+      }
+    ]
+  }
+]
+
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)
 
 function createMainWindow() {
 	const mainWindow = new BrowserWindow({
@@ -15,12 +132,34 @@ function createMainWindow() {
         }
 	});
 
-    const startUrl = url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file',
-    }); // Sieht aus, als sei format depricated, ggfs. muss ich das anders machen
-    
-    mainWindow.loadURL(startUrl);
+  const startUrl = url.format({
+      pathname: path.join(__dirname, 'index.html'),
+      protocol: 'file',
+  });
+
+  mainWindow.loadURL(startUrl);
+}
+
+function createSettingsWindow() {
+	const settingsWindow = new BrowserWindow({
+		title: 'Settings',
+		width: 750,
+		height: 420,
+        webPreferences: {
+            nodeIntegration: true,
+            preload: path.join(__dirname, 'preload.js')
+        }
+	});
+
+  const settingsUrl = url.format({
+      pathname: path.join(__dirname, 'settings.html'),
+      protocol: 'file',
+  });
+  settingsWindow.setMenu(null);
+  settingsWindow.loadURL(settingsUrl);
+  // settingsWindow.on('close', (e) => {
+  //   ipcMain.emit('refresh-checkboxes');
+  // });
 }
 
 
@@ -40,6 +179,22 @@ app.whenReady().then(() => {
   ipcMain.handle('file:readFile', async (event, filePath) => {
       const data = await fs.readFile(filePath, 'utf8');
       return data;
+  });
+
+  ipcMain.handle('file:readCSV', async (event, filePath) => {
+    try {
+      const fileContent = await fs.readFile(filePath, 'utf8');
+      data = fileContent.split(',');
+    } catch (err) {
+      data = []
+    }
+    return data;
+  });
+
+  ipcMain.handle('file:writeCSV', async (event, filePath, data) => {
+    const content = data.toString();
+    await fs.writeFile(filePath, content);
+    return data;
   });
 
   ipcMain.handle('save-entry', async (event, { formData, imageBuffer, imageName, basePath }) => {
