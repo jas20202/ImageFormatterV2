@@ -134,7 +134,7 @@ function createMainWindow() {
 	});
 
   const startUrl = url.format({
-      pathname: path.join(__dirname, 'index.html'),
+      pathname: path.join(__dirname, 'ui/index.html'),
       protocol: 'file',
   });
 
@@ -154,7 +154,7 @@ function createSettingsWindow() {
 	});
 
   const settingsUrl = url.format({
-      pathname: path.join(__dirname, 'settings.html'),
+      pathname: path.join(__dirname, 'ui/settings.html'),
       protocol: 'file',
   });
   settingsWindow.setMenu(null);

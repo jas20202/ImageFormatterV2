@@ -1,8 +1,8 @@
 let selectedIndex = -1;
-const customCharactersPath = "./checkboxes/CustomCharacters.csv";
-const customCategoriesPath = "./checkboxes/CustomCategories.csv";
-const defaultCharactersPath = "./checkboxes/DefaultCharacters.csv";
-const defaultCategoriesPath = "./checkboxes/DefaultCategories.csv";
+const customCharactersPath = "./settings/CustomCharacters.csv";
+const customCategoriesPath = "./settings/CustomCategories.csv";
+const defaultCharactersPath = "./settings/DefaultCharacters.csv";
+const defaultCategoriesPath = "./settings/DefaultCategories.csv";
 
 document.addEventListener('DOMContentLoaded', () => {
   loadCharacterList();
