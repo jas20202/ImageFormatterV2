@@ -2,7 +2,7 @@
   "name": "imageformatter",
   "version": "2.0.0",
   "description": "Tool to add metadata to images",
-  "main": "main.js",
+  "main": "app/src/main.js",
   "scripts": {
     "start": "electron .",
     "dev": "npx electronmon --trace-warnings ."
