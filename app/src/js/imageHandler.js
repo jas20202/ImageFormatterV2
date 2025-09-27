@@ -15,7 +15,7 @@ function setImage(pathOfImage) {
     imageLabel.innerHTML = "Load image";
 }
 
-imageInput.addEventListener('change', function () {
+imageInput.addEventListener('change', function () { // I will have to make the same logic here as I did with the load json 
     console.log(currentImagePath);
     const file = this.files[0];
     if (file) {

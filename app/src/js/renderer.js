@@ -5,37 +5,39 @@ const defaultCharactersPath = "settings/DefaultCharacters.csv";
 const defaultCategoriesPath = "settings/DefaultCategories.csv";
 
 document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('creation-date').setAttribute('max', today);
   loadCharacterList();
   loadCategoriesList();
 });
 
 async function loadCharacterList() {
     const customExists = await electronAPI.checkIfFileExists(customCharactersPath);
-    let data = []
+    let checkboxes = []
     if(customExists) {
-        data = await electronAPI.readCSV(customCharactersPath);
+        checkboxes = await electronAPI.readCSV(customCharactersPath);
     }else{
-        data = await electronAPI.readCSV(defaultCharactersPath);
+        checkboxes = await electronAPI.readCSV(defaultCharactersPath);
     }
-    renderCheckboxList('characters-list', data);
+    renderCheckboxList('characters-list', checkboxes);
 }
 
 async function loadCategoriesList() {
     const customExists = await electronAPI.checkIfFileExists(customCategoriesPath);
-    let data = []
+    let checkboxes = []
     if(customExists) {
-        data = await electronAPI.readCSV(customCategoriesPath);
+        checkboxes = await electronAPI.readCSV(customCategoriesPath);
     }else{
-        data = await electronAPI.readCSV(defaultCategoriesPath);
+        checkboxes = await electronAPI.readCSV(defaultCategoriesPath);
     }
-    renderCheckboxList('categories-list', data);
+    renderCheckboxList('categories-list', checkboxes);
 }
 
-function renderCheckboxList(id, data) {
+function renderCheckboxList(id, checkboxes) {
     const listContainer = document.getElementById(id);
     listContainer.innerHTML = '';
 
-    data.forEach((entry) => {
+    checkboxes.forEach((entry) => {
         const label = document.createElement('label');
         const input = document.createElement('input');
         input.type = "checkbox";
@@ -52,7 +54,7 @@ function getFormData() {
     console.log('path... ' + currentImagePath);
     return {
         Id: loadedData[selectedIndex]?.Id || crypto.randomUUID(),
-        PathOfImage: currentImageFile ? '': currentImagePath,  // leave blank if uploading a new image
+        PathOfImage: currentImagePath,  // leave blank if uploading a new image
         Title: document.getElementById('name').value,
         AltText: document.getElementById('alt').value,
         Description: document.getElementById('caption').value,
@@ -77,10 +79,11 @@ async function setFormData(data) {
     document.getElementById('trigger-warning').checked = data.NeedsTriggerWarning || false;
     document.getElementById('youtube-link').value = data.YouTubeLink || '';
     document.getElementById('spotify-link').value = data.SpotifyLink || '';
-
+    
     if (data.PathOfImage) {
         setImage(data.PathOfImage);
     }
+    console.log('imagePath... ' + currentImagePath);
 }
 
 function clearFields() {

@@ -56,29 +56,4 @@ async function loadJSON() {
             alert("Error parsing JSON: " + err.message);
         }
     }
-    //document.getElementById('json-loader').click();
 }
-
-document.getElementById('json-loader').addEventListener('change', function () { 
-    const file = this.files[0];
-    if (file) {
-        console.log('test: ' + file.webkitRelativePath)
-        basePath = electronAPI.dirname(file.webkitRelativePath);
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                loadedData = JSON.parse(e.target.result);
-                if (Array.isArray(loadedData) && loadedData.length > 0) {
-                    selectedIndex = 0;
-                    setFormData(loadedData[0]);
-                    renderEntryList();
-                } else {
-                    alert("JSON is not a valid array or is empty.");
-                }
-            } catch (err) {
-                alert("Error parsing JSON: " + err.message);
-            }
-        };
-        reader.readAsText(file);
-    }
-});

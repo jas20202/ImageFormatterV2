@@ -1,4 +1,4 @@
-let data = [];
+let checkboxes = [];
 let openSettings = ""
 const title = document.getElementById("title");
 const customCharactersPath = "settings/CustomCharacters.csv";
@@ -13,7 +13,7 @@ async function loadCharacterList() {
     document.getElementById('categoriesButton').classList.remove('active');
     title.innerHTML = "Edit Characters List";
     openSettings = customCharactersPath;
-    data = await electronAPI.readCSV(customCharactersPath);
+    checkboxes = await electronAPI.readCSV(customCharactersPath);
     renderEntryList();
 }
 
@@ -22,7 +22,7 @@ async function loadCategoriesList() {
     document.getElementById('charactersButton').classList.remove('active');
     title.innerHTML = "Edit Categories List";
     openSettings = customCategoriesPath;
-    data = await electronAPI.readCSV(customCategoriesPath);
+    checkboxes = await electronAPI.readCSV(customCategoriesPath);
     renderEntryList();
 }
 
@@ -35,10 +35,10 @@ async function addNewEntry() {
   try {
     if (openSettings !== "") {
       const input = document.getElementById('input');
-      data.push(input.value);
+      checkboxes.push(input.value);
       input.value = "";
-      data.sort();
-      data = await electronAPI.writeCSV(openSettings, data);
+      checkboxes.sort();
+      checkboxes = await electronAPI.writeCSV(openSettings, checkboxes);
       renderEntryList();
     }
   } catch (err) {
@@ -49,8 +49,8 @@ async function addNewEntry() {
 async function removeEntry(index) {
   try {
     if (openSettings !== "") {
-      data.splice(index, 1);
-      data = await electronAPI.writeCSV(openSettings, data);
+      checkboxes.splice(index, 1);
+      checkboxes = await electronAPI.writeCSV(openSettings, checkboxes);
       renderEntryList();
     }
   } catch (err) {
@@ -62,7 +62,7 @@ function renderEntryList() {
     const listContainer = document.getElementById('custom-list');
     listContainer.innerHTML = '';
 
-    data.forEach((entry, index) => {
+    checkboxes.forEach((entry, index) => {
         const div = document.createElement('div');
         div.textContent = entry;
         div.className = 'entry-item';

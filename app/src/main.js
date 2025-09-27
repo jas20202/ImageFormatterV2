@@ -146,7 +146,7 @@ function createSettingsWindow() {
 		title: 'Settings',
 		width: 750,
 		height: 420,
-    icon:'favicon.png',
+    icon: path.join(__dirname, 'favicon.png'),
       webPreferences: {
           nodeIntegration: true,
           preload: path.join(__dirname, 'preload.js')
@@ -205,6 +205,7 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('file:writeCSV', async (event, filePath, data) => {
+    filePath = path.join(__dirname, filePath);
     const content = data.toString();
     await fs.writeFile(filePath, content);
     return data;
